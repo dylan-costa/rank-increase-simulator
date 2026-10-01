@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .eq { font-family: Georgia, 'Times New Roman', serif; fill: #5eead4; fill-opacity: 0.09; }
+      .curve { fill: none; stroke: #5eead4; stroke-opacity: 0.16; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+      .ol { stroke: #5eead4; stroke-opacity: 0.09; stroke-width: 1.6; }
+    </style>
+  </defs>
+
+  <!-- Elliptic curve y^2 = x^3 - 3x + 3 (single real component), decorative -->
+  <g transform="translate(1300,15) scale(0.7)">
+    <path class="curve" d="M 11,400
+      L 23,340 L 46,304 L 81,278 L 139,266 L 196,275 L 254,296 L 312,323 L 369,340 L 427,318 L 485,266 L 543,200 L 600,125" />
+    <path class="curve" d="M 11,400
+      L 23,460 L 46,496 L 81,522 L 139,534 L 196,525 L 254,504 L 312,477 L 369,460 L 427,482 L 485,534 L 543,600 L 600,675" />
+  </g>
+
+  <!-- Scattered notation, kept to the margins so it never sits under body text -->
+  <text class="eq" x="80"  y="130" font-size="30" transform="rotate(-6 80 130)">y&#178; = x&#179; - 3x + 3</text>
+  <text class="eq" x="180" y="280" font-size="46" transform="rotate(4 180 280)">E(&#8474;)</text>
+  <text class="eq" x="90"  y="430" font-size="32" transform="rotate(-5 90 430)">T<tspan baseline-shift="sub" font-size="65%">&#8467;</tspan>(E)</text>
+
+  <text class="eq" x="55" y="585" font-size="22" transform="rotate(-3 55 585)"
+    >&#961;<tspan baseline-shift="sub" font-size="70%">&#8467;</tspan> : G<tspan baseline-shift="sub" font-size="70%">&#8474;</tspan> &#8594; GL<tspan baseline-shift="sub" font-size="70%">2</tspan>(&#8484;<tspan baseline-shift="sub" font-size="70%">&#8467;</tspan>)</text>
+
+  <text class="eq" x="60"  y="740" font-size="26" transform="rotate(3 60 740)">rank(E) = r</text>
+  <text class="eq" x="110" y="900" font-size="30" transform="rotate(-4 110 900)"
+    >Gal(<tspan id="qbar">&#8474;</tspan>/&#8474;)</text>
+  <line class="ol" x1="166" y1="866" x2="189" y2="866" transform="rotate(-4 110 900)" />
+  <text class="eq" x="250" y="1000" font-size="24" transform="rotate(6 250 1000)">&#8467;-adic</text>
+
+  <text class="eq" x="700"  y="50" font-size="28" transform="rotate(-3 700 50)">&#8750; &#969;</text>
+  <text class="eq" x="1000" y="60" font-size="26" transform="rotate(4 1000 60)">&#931; a<tspan baseline-shift="sub" font-size="70%">n</tspan> q<tspan baseline-shift="sub" font-size="70%">n</tspan></text>
+
+  <text class="eq" x="1520" y="880"  font-size="22" transform="rotate(-5 1520 880)">&#916; = -16(4a&#179;+27b&#178;)</text>
+  <text class="eq" x="1650" y="960"  font-size="26" transform="rotate(3 1650 960)">N = &#8719; p<tspan baseline-shift="sub" font-size="70%">e</tspan></text>
+  <text class="eq" x="1600" y="1030" font-size="24" transform="rotate(-4 1600 1030)">&#1064;(E/&#8474;)</text>
+</svg>

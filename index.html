@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rank Increase Simulator</title>
+  <meta name="description" content="Pick an elliptic curve over Q and a target rank; find the quadratic twist of smallest |d| with that Mordell–Weil rank, computed live in your browser with PARI/GP.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <div class="topnav">
+    <a href="https://dylan-costa.github.io/index.html">Home</a>
+    <a href="https://dylan-costa.github.io/notes.html">Notes</a>
+    <div class="dropdown">
+      <button class="dropbtn">Teaching</button>
+      <div class="dropdown-content">
+        <a href="https://dylan-costa.github.io/teaching.html">Courses Taught</a>
+        <a href="https://dylan-costa.github.io/courseresources.html">Course Resources</a>
+      </div>
+    </div>
+    <a href="https://dylan-costa.github.io/research.html">Research</a>
+    <a href="https://dylan-costa.github.io/cv.html">CV</a>
+    <a class="active" href="https://dylan-costa.github.io/projects.html">Projects</a>
+    <a href="https://dylan-costa.github.io/outsidemath.html">Outside of Math</a>
+  </div>
+
+  <header class="intro">
+    <div class="eyebrow">Interactive &middot; Elliptic curves over the rationals</div>
+    <h1>Rank Increase Simulator</h1>
+    <p class="lead">
+      Enter an elliptic curve <span class="m" data-tex="E/\mathbb{Q}"></span> and choose a rank.
+      The simulator goes through the squarefree integers <span class="m" data-tex="d"></span>
+      in order of <span class="m" data-tex="|d|"></span> and finds the first quadratic twist
+      <span class="m" data-tex="E^{(d)}"></span> whose Mordell&ndash;Weil group has that rank.
+      Everything is computed live in your browser with
+      <a href="https://pari.math.u-bordeaux.fr/" target="_blank" rel="noopener">PARI/GP</a>.
+    </p>
+    <details class="explainer">
+      <summary>What is a quadratic twist?</summary>
+      <p>
+        If <span class="m" data-tex="E : y^2 = x^3 + ax + b"></span>, its quadratic twist by a squarefree integer
+        <span class="m" data-tex="d"></span> is
+        <span class="m" data-tex="E^{(d)} : dy^2 = x^3 + ax + b"></span>, or equivalently
+        <span class="m" data-tex="y^2 = x^3 + ad^2x + bd^3"></span>. The curves
+        <span class="m" data-tex="E"></span> and <span class="m" data-tex="E^{(d)}"></span>
+        become isomorphic over <span class="m" data-tex="\mathbb{Q}(\sqrt{d})"></span>, yet their groups of
+        rational points can look completely different. In particular, the rank can go up or down.
+      </p>
+      <p>
+        Goldfeld's conjecture predicts that, counted by <span class="m" data-tex="|d|"></span>, half of all twists
+        have rank 0, half have rank 1, and ranks <span class="m" data-tex="\ge 2"></span> occur with density zero.
+        The running tally below lets you watch this happen.
+      </p>
+      <p>
+        <strong>How ranks are certified.</strong> PARI's <code>ellrank</code> runs a 2-descent that gives
+        lower and upper bounds for the rank. When they agree, the rank is proven. Otherwise the simulator computes
+        the analytic rank. If that is 0 or 1, the rank equals it by Gross&ndash;Zagier&ndash;Kolyvagin; if it is
+        <span class="m" data-tex="\ge 2"></span>, equality assumes the Birch&ndash;Swinnerton-Dyer conjecture,
+        and the result is labelled as such.
+      </p>
+    </details>
+  </header>
+
+  <!-- Step 1 -------------------------------------------------------------->
+  <section class="card" id="step-curve">
+    <div class="step-head">
+      <span class="step-num">1</span>
+      <h2>Enter an elliptic curve</h2>
+    </div>
+
+    <div class="segmented" role="tablist" aria-label="Equation form">
+      <button role="tab" id="tab-long" aria-selected="true" data-form="long">General Weierstrass</button>
+      <button role="tab" id="tab-short" aria-selected="false" data-form="short">Short Weierstrass</button>
+    </div>
+
+    <div class="fill-eq" id="form-long" role="group" aria-label="General Weierstrass equation">
+      <span class="eqt">y<sup>2</sup> +</span>
+      <input class="coef" data-i="0" inputmode="text" aria-label="a1" placeholder="0">
+      <span class="eqt">xy +</span>
+      <input class="coef" data-i="2" inputmode="text" aria-label="a3" placeholder="0">
+      <span class="eqt">y = x<sup>3</sup> +</span>
+      <input class="coef" data-i="1" inputmode="text" aria-label="a2" placeholder="0">
+      <span class="eqt">x<sup>2</sup> +</span>
+      <input class="coef" data-i="3" inputmode="text" aria-label="a4" placeholder="0">
+      <span class="eqt">x +</span>
+      <input class="coef" data-i="4" inputmode="text" aria-label="a6" placeholder="0">
+    </div>
+
+    <div class="fill-eq" id="form-short" role="group" aria-label="Short Weierstrass equation" hidden>
+      <span class="eqt">y<sup>2</sup> = x<sup>3</sup> +</span>
+      <input class="coef" data-i="0" inputmode="text" aria-label="a" placeholder="0">
+      <span class="eqt">x +</span>
+      <input class="coef" data-i="1" inputmode="text" aria-label="b" placeholder="0">
+    </div>
+
+    <p class="hint">Fill in integers or fractions such as <code>-1/16</code>. Blank boxes count as 0.</p>
+
+    <label class="text-entry">
+      <span>Or type the coefficients the usual way (as in the LMFDB, Sage or Magma)</span>
+      <input id="coeff-text" spellcheck="false" autocomplete="off" placeholder="[a1,a2,a3,a4,a6]  or  [a,b]">
+    </label>
+    <p class="hint">Five numbers <code>[a1,a2,a3,a4,a6]</code> for the general form, or two numbers <code>[a,b]</code> for
+      <span class="m" data-tex="y^2 = x^3 + ax + b"></span>. Pasting <code>EllipticCurve([0,0,1,-7,6])</code> works too.</p>
+
+    <div class="examples">
+      <span class="examples-label">Examples:</span>
+      <button class="chip" data-ainvs="0,-1,1,-10,-20" title="LMFDB 11.a2">11.a2 &middot; rank 0</button>
+      <button class="chip" data-ainvs="0,0,1,-1,0" title="LMFDB 37.a1">37.a1 &middot; rank 1</button>
+      <button class="chip" data-ainvs="0,1,1,-2,0" title="LMFDB 389.a1">389.a1 &middot; rank 2</button>
+      <button class="chip" data-ainvs="0,0,1,-7,6" title="LMFDB 5077.a1">5077.a1 &middot; rank 3</button>
+      <button class="chip" data-ainvs="1,-1,0,-79,289" title="LMFDB 234446.a1, the rank-4 curve of smallest known conductor">234446.a1 &middot; rank 4</button>
+      <button class="chip" data-ainvs="0,0,1,-79,342" title="LMFDB 19047851.a1, the rank-5 curve of smallest known conductor">19047851.a1 &middot; rank 5</button>
+      <button class="chip" data-short="-1,0" title="LMFDB 32.a3, CM by Z[i]">y&sup2; = x&sup3; &minus; x</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="btn-analyze" disabled>Compute <span class="m" data-tex="E(\mathbb{Q})"></span></button>
+      <span class="engine-status" id="engine-status" aria-live="polite">Loading PARI/GP&hellip;</span>
+    </div>
+    <p class="error" id="curve-error" role="alert" hidden></p>
+  </section>
+
+  <section class="card curve-card" id="curve-result" hidden aria-live="polite"></section>
+
+  <!-- Step 2 -------------------------------------------------------------->
+  <section class="card" id="step-twist" hidden>
+    <div class="step-head">
+      <span class="step-num">2</span>
+      <h2>Find a quadratic twist of rank&hellip;</h2>
+    </div>
+
+    <div class="rank-picker" role="radiogroup" aria-label="Target rank">
+      <button role="radio" aria-checked="false" data-rank="0"><span class="rk">0</span><span class="rk-sub">rank 0</span></button>
+      <button role="radio" aria-checked="false" data-rank="1"><span class="rk">1</span><span class="rk-sub">rank 1</span></button>
+      <button role="radio" aria-checked="false" data-rank="2"><span class="rk">2</span><span class="rk-sub">rank 2</span></button>
+      <button role="radio" aria-checked="false" data-rank="3"><span class="rk">3</span><span class="rk-sub">rank 3</span></button>
+      <button role="radio" aria-checked="false" data-rank="4"><span class="rk">&ge; 4</span><span class="rk-sub">rank 4 or more</span></button>
+    </div>
+
+    <div class="range-row">
+      <label for="range-x">Search all squarefree <span class="m" data-tex="d \ne 1"></span> with <span class="m" data-tex="|d| \le X"></span>, where <span class="m" data-tex="X ="></span></label>
+      <input id="range-x" type="number" min="1" max="10000" step="1" value="100">
+      <span class="hint" id="range-count"></span>
+    </div>
+    <p class="hint">Order: <span class="m" data-tex="d = -1, 2, -2, 3, -3, 5, -5, 6, \dots"></span>
+      (by <span class="m" data-tex="|d|"></span>, positive first). The maximum is <span class="m" data-tex="X = 10{,}000"></span>.</p>
+    <p class="hint" id="j1728-note" hidden>Since <span class="m" data-tex="j(E) = 1728"></span>, the twists by
+      <span class="m" data-tex="d"></span> and <span class="m" data-tex="-d"></span> are isomorphic, so they always have the same rank.</p>
+
+    <div class="actions">
+      <button class="btn-primary" id="btn-search" disabled>Find twist</button>
+    </div>
+  </section>
+
+  <!-- Search progress ------------------------------------------------------>
+  <section class="card" id="search-panel" hidden>
+    <div class="search-top">
+      <div>
+        <div class="eyebrow" id="search-title">Searching</div>
+        <div class="progress-text" id="progress-text"></div>
+      </div>
+      <button class="btn-ghost" id="btn-stop">Stop</button>
+    </div>
+    <div class="progress" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div class="tally-wrap">
+      <div class="tally-title">Ranks of the twists checked so far</div>
+      <div class="tally" id="tally"></div>
+    </div>
+
+    <details class="log" id="log-details">
+      <summary>Every twist checked (<span id="log-count">0</span>)</summary>
+      <div class="log-scroll">
+        <table>
+          <thead><tr><th>d</th><th>Conductor of <span class="m" data-tex="E^{(d)}"></span></th><th>Rank</th><th>How</th></tr></thead>
+          <tbody id="log-body"></tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <div id="results"></div>
+
+  <footer class="site-footer">
+    <p>
+      Computations use the <a href="https://pari.math.u-bordeaux.fr/gpwasm.html" target="_blank" rel="noopener">WebAssembly build of PARI/GP</a>
+      (GPL) and run entirely on your device. Nothing you enter is sent anywhere.
+      Curve pages link to the <a href="https://www.lmfdb.org/EllipticCurve/Q/" target="_blank" rel="noopener">LMFDB</a>.
+      Source on <a href="https://github.com/dylan-costa/rank-increase-simulator" target="_blank" rel="noopener">GitHub</a>.
+    </p>
+  </footer>
+
+  <noscript><p class="error">This simulator needs JavaScript and WebAssembly.</p></noscript>
+</body>
+</html>
